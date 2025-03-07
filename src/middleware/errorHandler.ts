@@ -8,7 +8,7 @@ export const errorHandler = (
 ) => {
   console.error(err.stack);
   res.status(500).json({
-    message: '服务器内部错误',
+    message: 'Internal server error',
     error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
 };
