@@ -42,10 +42,10 @@
 #           VPS_PASSWORD: ${{ secrets.VPS_PASSWORD }}
 #         run: |
 #           sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST << 'EOF'
-#             cd users-micro-service
+#             cd task-management
 #             git pull origin main
 #             npm i
 #             npm run build
 #             cd ..
-#             pm2 restart users-micro-service
+#             pm2 restart task-management
 #           EOF
