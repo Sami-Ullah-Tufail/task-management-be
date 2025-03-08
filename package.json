@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js --port 5001",
-    "dev": "nodemon --exec ts-node src/index.ts",
+    "dev": "npx nodemon --exec ts-node src/index.ts"
     "build": "tsc",
     "watch-ts": "tsc -w"
   },
