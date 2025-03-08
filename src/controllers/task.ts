@@ -9,8 +9,34 @@ interface AuthRequest extends Request {
 export const Tasks = {
   async getTasks(req: AuthRequest, res: Response) {
     try {
-      const tasks = await Task.find({ user: req.user?.userId }).sort({ createdAt: -1 });
-      res.status(200).json(tasks);
+      const limit = parseInt(req.query.limit as string) || 10;
+      const page = parseInt(req.query.page as string) || 1;
+      const skip = (page - 1) * limit;
+      const search = req.query.search as string;
+
+      const query: any = { user: req.user?.userId };
+      
+      if (search) {
+        query.$or = [
+          { title: { $regex: search, $options: 'i' } },
+          { status: { $regex: search, $options: 'i' } }
+        ];
+      }
+
+      const [tasks, totalDocs] = await Promise.all([
+        Task.find(query)
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit),
+        Task.countDocuments(query)
+      ]);
+
+      res.status(200).json({
+        tasks,
+        totalDocs,
+        page,
+        limit
+      });
     } catch (error) {
       res.status(500).json({ message: 'Failed to get task list' });
     }
@@ -106,27 +132,27 @@ export const Tasks = {
     }
   },
 
-  async searchTasks(req: AuthRequest, res: Response) {
+  async getAnalytics(req: AuthRequest, res: Response) {
     try {
-      const { title, status } = req.query;
-      
-      const query: any = {
-        user: req.user?.userId
-      };
+      const userId = req.user?.userId;
 
-      if (title && String(title).trim()) {
-        const searchRegex = new RegExp(String(title), 'i');
-        query.title = searchRegex;
-      }
+      const totalTasks = await Task.countDocuments({ user: userId });
+      const pendingTasks = await Task.countDocuments({ 
+        user: userId,
+        status: 'pending'
+      });
+      const completedTasks = await Task.countDocuments({
+        user: userId, 
+        status: 'complete'
+      });
 
-      if (status && String(status).trim() && ['pending', 'completed'].includes(String(status)))
-        query.status = String(status);
-
-      const tasks = await Task.find(query);
-
-      res.status(200).json(tasks);
+      res.status(200).json({
+        total: totalTasks,
+        pending: pendingTasks,
+        completed: completedTasks
+      });
     } catch (error) {
-      res.status(500).json({ message: 'Failed to search tasks' });
+      res.status(500).json({ message: 'Failed to fetch analytics' });
     }
   }
 };

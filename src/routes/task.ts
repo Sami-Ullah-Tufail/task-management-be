@@ -4,7 +4,7 @@ import { Tasks } from '../controllers/task';
 
 const router = Router();
 
-router.get('/search', authMiddleware, Tasks.searchTasks);
+router.get('/analytics', authMiddleware, Tasks.getAnalytics);
 router.get('/', authMiddleware, Tasks.getTasks);
 router.post('/', authMiddleware, Tasks.createTask);
 router.get('/:id', authMiddleware, Tasks.getTaskById);

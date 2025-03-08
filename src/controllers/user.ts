@@ -4,24 +4,6 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 export const userController = {
-  async getUsers(req: Request, res: Response) {
-    try {
-      const users = await User.aggregate([
-        {
-          $project: {
-            name: 1,
-            email: 1,
-            createdAt: 1,
-            _id: 1
-          }
-        }
-      ]);
-      res.json(users);
-    } catch (error) {
-      res.status(500).json({ message: 'Failed to get users list' });
-    }
-  },
-
   async loginUser(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
